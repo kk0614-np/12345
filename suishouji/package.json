@@ -1,0 +1,10 @@
+{
+  "name": "suishouji",
+  "version": "1.0.0",
+  "description": "随手记 - 记账和奶茶记录",
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}
