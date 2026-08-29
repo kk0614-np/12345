@@ -26,29 +26,38 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Check files
+      - name: Validate package.json
         run: |
-          echo "=== Files in root ==="
-          ls -la
-          echo "=== Files in www ==="
-          ls -la www/ || echo "www directory not found!"
-          echo "=== package.json ==="
-          cat package.json || echo "package.json not found!"
+          echo "=== package.json content ==="
+          cat package.json
+          echo ""
+          echo "=== Validating JSON ==="
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json is valid JSON')"
+
+      - name: Check www directory
+        run: |
+          echo "=== www directory ==="
+          ls -la www/
+          echo "=== index.html exists? ==="
+          test -f www/index.html && echo "YES" || echo "NO - MISSING!"
 
       - name: Install npm dependencies
-        run: npm install --verbose
+        run: |
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm install --no-audit --no-fund
 
       - name: Add Android platform
-        run: npx cap add android --verbose
+        run: npx cap add android
 
       - name: Sync Capacitor
-        run: npx cap sync android --verbose
+        run: npx cap sync android
 
       - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
